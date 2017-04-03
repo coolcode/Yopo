@@ -1,0 +1,48 @@
+{% extends "common/base.html" %}
+
+{% block body %}
+
+    <div class="container-fluid wrap">
+
+        <!-- Main jumbotron for a primary marketing message or call to action-->
+
+        <div class="jumbotron">
+            <h1>Create Account</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 text-center">
+                <img src="/static/img/mongoose.png" width="100%">
+            </div>
+        </div>
+        <div><br></div>
+        <form role="form" method="post" data-toggle="validator">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-12">
+                    <div class="form-group">
+                        <label for="username">User Name</label>
+                        <input type="text" class="form-control" name="username" placeholder="User Name"
+                               value="{{ username }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" name="password" placeholder="Password"
+                               value="{{ password }}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6 col-sm-6">
+                    <input type="submit" class="btn btn-default" value="Sign Up"/>
+                </div>
+                <div class="col-xs-6 col-sm-6 text-right">
+                    <a href="/login">Sign In</a>
+                </div>
+            </div>
+        </form>
+        {% if error and error != '' %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+
+{% block body %}
+
+    <div class="container-fluid wrap">
+
+        {% include "common/toolbar_sub.html" %}
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+
+        <div class="jumbotron">
+            <h1>Upload Photo</h1>
+        </div>
+<!-- login form -->
+        <form id="img_form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+            <div class="form-group">
+                <label for="username"></label>
+                <label class="btn btn-default btn-file">
+                    Browse photo<input id="image" name="image" type="file" style="display: none;" >
+                </label>
+            </div>
+            <div class="form-group">
+               <img src="{% cloudinary_url user_img format="jpg" width=400 height=400 crop="fill" class="priview"%}" width="100%"/>
+            </div>
+
+            <div>
+                <div style="width:50%;padding:0;margin:0;float:left;box-sizing:border-box;">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="history.back()">Back</button>
+                </div>
+                <div style="text-align:right">
+                    <a href="/pre" class="btn btn-primary btn-lg">Next</a>
+                </div>
+            </div>
+        </form>
+
+    </div> <!-- /container -->
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery.loading.js"></script>
+    <script>
+        $(function () {
+            $('#image').change(function () {
+                waitingDialog.show();
+                $('#img_form').submit();
+            });
+
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+
+{% block body %}
+
+    <div class="container-fluid wrap">
+    {% include "common/toolbar.html" %}
+
+        <div class="row text-center">
+            <img src="/static/img/match.png" width="95%"/>
+        </div>
+        <div class="row text-center">
+
+                <img src="{% cloudinary_url liked_picid format="jpg" width=200 height=200 radius=100 crop="fill" class="priview" %}" width="45%"/>
+
+                <img src="{% cloudinary_url picid format="jpg" width=200 height=200 radius=100 crop="fill" class="priview" %}" width="45%"/>
+
+        </div>
+        <br>
+        <br>
+        <div class="row text-center">
+            <a href="/message"><h4>Send a message to</h4> <h3>{{ liked_user_display_name }}</h3></a>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+
+
+{% endblock %}

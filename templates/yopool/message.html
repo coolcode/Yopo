@@ -1,0 +1,45 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+{% block body %}
+
+    <div class="container-fluid wrap">
+        {% include "common/toolbar_sub.html" %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="table-container">
+                            <table class="table table-filter">
+                                <tbody>
+                                {% for user in users %}
+                                    <tr data-status="pagado">
+                                        <td>
+                                            <a href="/chat?user={{ user.name }}&picid={{ user.picid }}">
+                                                <div class="media">
+                                                    <div class="pull-left">
+                                                        <img src="{% cloudinary_url user.picid format="jpg" width=100 height=100 radius=100 crop="fill" class="priview" %}"
+                                                             class="media-photo"/>
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <span class="media-meta pull-right">{{ user.match_date }}</span>
+                                                        <h4 class="title">
+                                                            {{ user.display_name }}
+                                                            <span class="pull-right pagado"></span>
+                                                        </h4>
+                                                        <p class="summary">{{ user.memo }}</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

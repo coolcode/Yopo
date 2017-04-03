@@ -1,0 +1,105 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+
+{% block body %}
+
+
+    <div class="container-fluid wrap">
+    {% include "common/toolbar_sub.html" %}
+        <div class="jumbotron">
+            <h1>User Profile</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+
+            <form id="img_form" action="/upload_photo" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+                <input id="image" name="image" type="file" style="display: none;" >
+                <a id="img_wrap" href="#" class="thumbnail">
+                    <img src="{% cloudinary_url picid format="jpg" width=400 height=400 crop="fill" class="priview" %}"
+                         width="100%"/>
+                </a>
+            </form>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-12 col-sm-12">
+                <form method="post"  data-toggle="validator">
+            {% csrf_token %}
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <span>{{ name }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="display_name">Display Name</label>
+                        <input type="text" class="form-control" name="display_name" placeholder="Display Name"
+                               value="{{ display_name }}" required>
+                    </div>
+                    <!--
+                    <div class="form-group">
+                        <label for="Age">Age</label>
+                        <input type="number" class="form-control" id="InputAge" placeholder="Age" min="10" max="99">
+                    </div> -->
+                    <div class="form-group">
+                        <label for="Gender">Gender</label>
+                        <select name="sex" required>
+                            <option {% if sex == 'f' %} selected{% endif %}>Female</option>
+                            <option {% if sex == 'm' %} selected{% endif %}>Male</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memo">Meno</label>
+                        <textarea class="form-control" rows="4" placeholder="Memo" name="memo">{{ memo }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-default" value="Save"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 text-left">
+                <a href="/pre">Preference </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 text-left">
+                <a href="/change_password">Change Password </a>
+            </div>
+            <div class="col-xs-6 col-sm-6 text-right">
+                <a href="/logout"> <span class="glyphicon glyphicon-log-out"></span> Logout </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 text-left">
+                <a href="/delete_account" onclick="return confirm('Are you sure to delete all your information?')">Delete Account</a>
+            </div>
+        </div>
+        <!--<br/>
+        <div class="row">
+            <a type="button" class="btn btn-primary btn-lg" href="/login">Logout</a>
+        </div>-->
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery.loading.js"></script>
+    <script>
+        $(function () {
+            $('#img_wrap').click(function () {
+                $('#image').click();
+            });
+
+            $('#image').change(function () {
+                waitingDialog.show();
+                $('#img_form').submit();
+            });
+
+        });
+    </script>
+
+{% endblock %}

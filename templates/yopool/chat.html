@@ -1,0 +1,199 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+
+{% block body %}
+
+
+    <div class="container-fluid wrap">
+    {% include "common/toolbar_sub.html" %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <div class="chat_window">
+                    <div class="top_menu">
+                        <div class="buttons">
+                            <div class="button"><a href="/"></a></div>
+                        </div>
+                        <div class="title">{{ chat_user.display_name }}</div>
+                    </div>
+                    <ul class="messages">
+                        {% for m in msg_list %}
+                            <li class="message appeared {% if m.message_side == 'left' %} left {% else %} right {% endif %}">
+                                <div class="avatar">
+                                {% if m.message_side == 'left' %}
+                                    <img src="{% cloudinary_url chat_user.picid format="jpg" width=60 height=60 radius=100 crop="fill" class="priview" %}"
+                                                           class="media-photo"/>
+                                    {% else %}
+                                    <img src="{% cloudinary_url current_user.picid format="jpg" width=60 height=60 radius=100 crop="fill" class="priview" %}"
+                                                           class="media-photo"/>
+                                    {% endif %}
+                                </div>
+                                <div class="text_wrapper">
+                                    <div class="text">{{ m.msg }}</div>
+                                </div>
+                            </li>
+
+                        {% endfor %}
+                    </ul>
+                    <div class="bottom_wrapper clearfix">
+                        <div class="message_input_wrapper"><input class="message_input" placeholder="Type your message here..."/></div>
+                        <div class="send_message">
+                            <div class="icon"></div>
+                            <div class="text">Send</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message_template">
+                    <li class="message">
+                        <div class="avatar">  <img src="" chat_user_icon="{% cloudinary_url chat_user.picid format="jpg" width=60 height=60 radius=100 crop="fill" class="priview" %}"
+                                                   current_user_icon="{% cloudinary_url current_user.picid format="jpg" width=60 height=60 radius=100 crop="fill" class="priview" %}"
+                                                   class="media-photo"/>
+                        </div>
+                        <div class="text_wrapper">
+                            <div class="text"></div>
+                        </div>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+(function () {
+    var Message;
+    Message = function (arg) {
+        this.text = arg.text, this.message_side = arg.message_side;
+        this.draw = function (_this) {
+            return function () {
+                var $message;
+                $message = $($('.message_template').clone().html());
+                $message.addClass(_this.message_side).find('.text').html(_this.text);
+                var img = $message.find('.media-photo');
+                img.attr('src', (_this.message_side=='left'? img.attr('chat_user_icon'):img.attr('current_user_icon')));
+                $('.messages').append($message);
+                return setTimeout(function () {
+                    return $message.addClass('appeared');
+                }, 0);
+            };
+        }(this);
+        return this;
+    };
+
+    $(function () {
+        var getMessageText, message_side, sendMessage;
+        message_side = 'right';
+        getMessageText = function () {
+            var $message_input;
+            $message_input = $('.message_input');
+            return $message_input.val();
+        };
+
+        sendMessageToServer= function(msg){
+            var data = { chat_user:'{{ chat_user.name }}',
+                msg:msg
+            };
+
+            $.ajax({
+                url: '/send_msg',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data),
+                dataType: 'JSON',
+                success: function(r) {
+                    console.log(r.status);
+                }
+            });
+        };
+
+        sendMessage = function (text, message_side) {
+            var $messages, message;
+            if (text.trim() === '') {
+                return;
+            }
+            $('.message_input').val('');
+            $messages = $('.messages');
+            //message_side = message_side === 'left' ? 'right' : 'left';
+            message = new Message({
+                text: text,
+                message_side: message_side
+            });
+            message.draw();
+            sendMessageToServer(text);
+            return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        };
+
+
+        $('.send_message').click(function (e) {
+            return sendMessage(getMessageText(), 'right');
+        });
+        $('.message_input').keyup(function (e) {
+            if (e.which === 13) {
+                return sendMessage(getMessageText(), 'right');
+            }
+        });
+
+        //sendMessage('Hello {{ current_user.display_name }}! :)', 'left');
+        timeout = function () {
+            setTimeout(function () {
+                //query msg
+                var data = { chat_user:'{{ chat_user.name }}'};
+
+                $.ajax({
+                    url: '/query_msg',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(data),
+                    dataType: 'JSON',
+                    success: function(r) {
+                        var list = r.msg_list;
+                        if(list.length==0){
+                            timeout();
+                            return;
+                        }
+
+                        var old_last_text = $('.messages').find('.text').last().text();
+                        var new_last_text = list[list.length-1].msg;
+
+                        if(old_last_text==new_last_text){
+                            console.log('no new message.')
+                            timeout();
+                            return;
+                        }else{
+                            console.log(old_last_text, '-', new_last_text)
+                        }
+
+                        $('.messages').empty();
+                        for (var i = 0; i < list.length; i++) {
+                            var m = list[i];
+
+                            message = new Message({
+                                text: m.msg,
+                                message_side: m.message_side
+                            });
+                            message.draw();
+                        }
+
+                        timeout();
+                    }
+                });
+
+            }, 3000);
+        };
+
+        timeout();
+
+        setTimeout(function () {
+            //return sendMessage('Hi Sandy! How are you?');
+        }, 1000);
+    });
+}.call(this));
+
+
+</script>
+{% endblock %}
+
+{% block css %}
+    <link href="/static/css/chat.css" rel="stylesheet">
+{% endblock %}

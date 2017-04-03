@@ -1,0 +1,133 @@
+{% extends "common/base.html" %}
+{% load cloudinary %}
+
+{% block body %}
+
+<div class="container-fluid wrap">
+    {% include "common/toolbar.html" %}
+
+    <div class="row" style="height: 70%">
+            <div id="tinderslide" >
+                <ul>
+                    {% for user in users %}
+                        <li class="" picid="{{ user.picid }}" user="{{ user.name }}">
+                            <div class="img">
+                                {% comment cloudinary user.picid format="jpg" width=400 height=400 crop="fill" class="priview"%} {% endcomment %}
+                                <img src="{% cloudinary_url user.picid format="jpg" width=400 height=400 crop="fill" class="priview" %}"
+                                     width="100%" style="min-height:200px;min-width: 200px; max-height:600px; max-width: 600px;" />
+                            </div>
+                            <div>{{ user.display_name }}</div>
+                            <div class="like"></div>
+                            <div class="dislike"></div>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            </div>
+    </div>
+
+    <!---->
+    <div class="row bottom-align-text">
+        <div class="actions">
+            <a href="#" class="dislike"><i></i></a>
+            <a href="#" class="like"><i></i></a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block css %}
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <!-- transform2d lib -->
+    <script type="text/javascript" src="/static/js/jquery.transform2d.js"></script>
+    <!-- jTinder lib -->
+    <script type="text/javascript" src="/static/js/jquery.jTinder.js"></script>
+    <!-- jTinder initialization script -->
+    <script>
+    /**
+     * jTinder initialization
+     */
+
+
+    $("#tinderslide").jTinder({
+        // like callback
+        onLike: function (item) {
+            // set the status text
+            //$('#status').html('Like image ' + (item.index()+1));
+            var liked_picid = item.attr("picid");
+            var liked_user = item.attr("user");
+            console.log(liked_picid,' - ', liked_user , item.index())
+
+            var data = {liked_user: liked_user};
+            $.ajax({
+                url: '/like',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data),
+                dataType: 'JSON',
+                success: function(r) {
+                    console.log(r.status, ' - ', r.msg);
+                    if(r.status == 'yes'){
+                        location.href = '/match?liked_user=' + liked_user+  '&liked_picid=' + liked_picid;
+                        return;
+                    }
+
+                    if(item.index()<=0){
+                        location.href = '/';
+                    }
+                }
+            });
+
+
+
+        },
+        // dislike callback
+        onDislike: function (item) {
+            // set the status text
+            var liked_picid = item.attr("picid");
+            var disliked_user = item.attr("user");
+            console.log(liked_picid,' - ', disliked_user , item.index())
+
+            var data = {disliked_user: disliked_user};
+            $.ajax({
+                url: '/dislike',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data),
+                dataType: 'JSON',
+                success: function(r) {
+                    console.log(r.status, ' - ', r.msg);
+
+                    if(item.index()<=0){
+                        location.href = '/';
+                    }
+                }
+            });
+
+
+        },
+        animationRevertSpeed: 200,
+        animationSpeed: 400,
+        threshold: 1,
+        likeSelector: '.like',
+        dislikeSelector: '.dislike'
+    });
+
+    /**
+     * Set button action to trigge3 jTinder like & dislike.
+     */
+    $('.actions .like, .actions .dislike').click(function(e){
+        e.preventDefault();
+        $("#tinderslide").jTinder($(this).attr('class'));
+    });
+
+    </script>
+
+{% endblock %}

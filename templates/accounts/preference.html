@@ -1,0 +1,50 @@
+{% extends "common/base.html" %}
+
+{% block body %}
+
+    <div class="container-fluid wrap">
+        {% include "common/toolbar_sub.html" %}
+        <div class="jumbotron">
+            <h1>Preference</h1>
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-12 col-sm-12">
+                <form method="post"  data-toggle="validator">
+            {% csrf_token %}
+                    <div class="form-group">
+                        <label for="Gender">Gender</label>
+                        </br>
+                        <select name="sex" required>
+                            <option {% if user_pre.sex == 'f' %} selected{% endif %}>Female</option>
+                            <option {% if user_pre.sex == 'm' %} selected{% endif %}>Male</option>
+                        </select>
+                    </div>
+                    <div class="form-group hidden">
+                        <label for="Age Range">Age Range</label>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <input name="age_from" type="number" class="form-control" placeholder="Min" min="10"
+                                       max="99" size="10" value="{{ user_pre.age_from }}">
+                            </div>
+                            <div class="col-xs-3">
+                                <input name="age_to" type="number" class="form-control" placeholder="Max" min="10"
+                                       max="99" size="10" value="{{ user_pre.age_to }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <input type="submit" value="Save" class="btn btn-default"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+
+
+{% endblock %}
