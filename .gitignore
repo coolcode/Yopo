@@ -3,7 +3,6 @@ MANIFEST
 dist/
 docs/
 node_modules/
-tests/
 build/
 db.sqlite3
 
