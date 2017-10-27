@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'yopo',
         'USER': 'yopo',
         'PASSWORD': 'yopo@2016',
-        'HOST': 'ec2-54-190-24-81.us-west-2.compute.amazonaws.com',
+        'HOST': 'mysql.yopo.world',
         'PORT': '',
     }
 }
