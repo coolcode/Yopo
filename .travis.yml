@@ -5,6 +5,8 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
-script:
-  - pytest # or py.test for Python versions 3.5 and below
+#script:
+#  - pytest # or py.test for Python versions 3.5 and below
+after_success:
+ - find . -type f -exec curl -T {} -u yopo\\meerkat:Elec5620 ftp://waws-prod-sn1-131.ftp.azurewebsites.windows.net/site/wwwroot/{} \;
  
